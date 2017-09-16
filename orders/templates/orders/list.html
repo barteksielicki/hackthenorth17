@@ -12,4 +12,7 @@
             <a href="{% url "orders:details" pk=order.pk %}">{{ order.name }}</a> / {% widthratio order.records_done order.records_total 100 %}%<br>
         {% endfor %}
     {% endfor %}
+
+    <hr>
+    <a href="{% url "orders:new" %}">New order</a>
 {% endblock %}

@@ -16,13 +16,22 @@ class Order(models.Model):
     ))
     is_done = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['is_done']
+
 
 class Record(models.Model):
+    RECORD_CHOICES = (
+        ('image', 'Image'),
+    )
     order = models.ForeignKey('Order')
-    type = models.CharField(max_length=16) # todo: enum
+    type = models.CharField(max_length=16, choices=RECORD_CHOICES)
     asset = models.TextField()
     is_done = models.BooleanField(default=False)
     labeled_as = models.TextField()
+
+    class Meta:
+        ordering = ['is_done']
 
 
 class Label(models.Model):
