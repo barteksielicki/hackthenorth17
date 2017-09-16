@@ -1,5 +1,3 @@
-from flask_restful import reqparse
-
 from ..flask_restful_extensions import Resource
 
 

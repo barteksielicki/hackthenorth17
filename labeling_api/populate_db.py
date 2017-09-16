@@ -16,13 +16,13 @@ def populate_db():
     db.session.add_all([
         models.Record(
             record_value='./images/spaghetti_bolognese.jpeg',
-            record_type='photo',
+            record_type='image',
             label_id=0,
             label_request_id=0,
         ),
         models.Record(
             record_value='./images/tortilla.jpeg',
-            record_type='photo',
+            record_type='image',
             label_id=1,
             label_request_id=0,
         ),

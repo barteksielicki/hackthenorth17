@@ -10,7 +10,7 @@ class SerializableMixin:
         attributes = list()
         # always add id to __repr__ (if present)
         if 'id_' in self.__dict__:
-            attributes.append('id={0}'.format(self.id))
+            attributes.append('id={0}'.format(self.id_))
         for attr in self.serializable_attrs:
             if attr == 'id_':
                 continue
@@ -24,5 +24,25 @@ class SerializableMixin:
         )
 
     def to_dict(self):
-        return {attr: getattr(self, attr)
-                for attr in self.serializable_attrs}
+        attributes = dict()
+        for attr in self.serializable_attrs:
+            attributes[attr] = getattr(self, attr)
+            to_dict_func = getattr(getattr(self, attr), 'to_dict', None)
+            if to_dict_func:
+                attributes[attr] = getattr(self, attr).to_dict()
+        if 'id_' in self.__dict__:
+            attributes['id'] = self.id_
+        return attributes
+
+
+class CRUDMixin:
+    def delete(self, commit=True):
+        db.session.delete(self)
+        if commit:
+            db.session.commit()
+
+    def save(self, commit=True, error_handler=None):
+        db.session.add(self)
+        if commit:
+            db.session.commit()
+        return self

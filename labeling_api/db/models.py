@@ -3,21 +3,25 @@ import enum
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from .db import (
+    CRUDMixin,
     db,
     SerializableMixin,
 )
 
 
 class RecordTypeEnum(enum.Enum):
-    PHOTO = 0
+    IMAGE = 0
     TEXT = 1
 
     @classmethod
     def get(cls, value, fallback=None):
         return cls.__members__.get(value.upper(), fallback)
 
+    def to_dict(self):
+        return self.name
 
-class Record(db.Model, SerializableMixin):
+
+class Record(db.Model, SerializableMixin, CRUDMixin):
     __tablename__ = 'record'
     serializable_attrs = [
         'record_type',
@@ -39,11 +43,7 @@ class Record(db.Model, SerializableMixin):
         db.ForeignKey('label_request.id_')
     )
 
-    label = db.relationship(
-        'Label',
-        cascade='all, delete-orphan',
-        single_parent=True,
-    )
+    labels = db.relationship('Label')
 
     @hybrid_property
     def record_type(self):
@@ -56,12 +56,13 @@ class Record(db.Model, SerializableMixin):
             raise ValueError('Bad Record Type!')
         self._record_type = tmp
 
-    @property
-    def labels(self):
-        return self.label.values
+    def to_dict(self):
+        dict_ = super().to_dict()
+        dict_['labels'] = self.labels
+        return dict_
 
 
-class Label(db.Model, SerializableMixin):
+class Label(db.Model, SerializableMixin, CRUDMixin):
     __tablename__ = 'label'
     serializable_attrs = [
         'values',
@@ -76,8 +77,11 @@ class Label(db.Model, SerializableMixin):
     values = db.Column(db.String, nullable=False)
 
 
-class LabelRequest(db.Model, SerializableMixin):
+class LabelRequest(db.Model, SerializableMixin, CRUDMixin):
     __tablename__ = 'label_request'
+    serializable_attrs = [
+        'records',
+    ]
 
     id_ = db.Column(
         db.Integer,
@@ -91,3 +95,8 @@ class LabelRequest(db.Model, SerializableMixin):
         cascade='all, delete-orphan',
         lazy='dynamic',
     )
+
+    def to_dict(self):
+        dict_ = super().to_dict()
+        dict_['records'] = [r.to_dict() for r in self.records.all()]
+        return dict_
