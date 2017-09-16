@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ order.name }}</h1>
+    {% for record in order.record_set.all %}
+        {% if record.type == 'image' %}
+            <img src="{{ record.asset }}">
+            {% if record.is_done %}
+                {{ record.labeled_as }}
+            {% else %}
+                No data available yet
+            {% endif %}
+        {% endif %}
+        <hr>
+    {% endfor %}
+{% endblock %}

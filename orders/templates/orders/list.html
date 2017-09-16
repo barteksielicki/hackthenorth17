@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+    {% regroup object_list by is_done as orders_groups %}
+    {% for group in orders_groups %}
+        {% if group.grouper %}
+            <h1>In progress</h1>
+        {% else %}
+            <h1>Done</h1>
+        {% endif %}
+        {% for order in group.list %}
+            <a href="{% url "orders:details" pk=order.pk %}">{{ order.name }}</a> / {% widthratio order.records_done order.records_total 100 %}%<br>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

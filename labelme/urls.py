@@ -18,5 +18,7 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url('', include('social_django.urls', namespace='social'))
+    url('', include('users.urls', namespace='users')),
+    url('', include('social_django.urls', namespace='social')),
+    url('^orders/', include('orders.urls', namespace='orders'))
 ]
