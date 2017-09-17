@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if not record %}
+        <p>No data to label. Please come back soon.</p>
+    {% else %}
+        <p>{{ record.description }}</p>
+        <img src="{{ record.asset }}" style="max-width: 400px; max-height: 400px;">
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Answer">
+        </form>
+    {% endif %}
+{% endblock %}

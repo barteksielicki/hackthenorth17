@@ -33,13 +33,14 @@ class Record(models.Model):
     class Meta:
         ordering = ['is_done']
 
+    def check_if_done(self, answer):
+        if self.label_set.filter(answer__iexact=answer).count() >= self.order.verifications_needed:
+            self.labeled_as = answer
+            self.is_done = True
+            self.save()
+
 
 class Label(models.Model):
     record = models.ForeignKey('Record')
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     answer = models.TextField()
-
-
-
-
-

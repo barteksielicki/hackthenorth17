@@ -1,15 +1,16 @@
+import os
 import zipfile
 from uuid import uuid4
 
-import os
 from django.conf import settings
 from django.db.models import Count, Sum
 from django.http import HttpResponseRedirect
-from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, DetailView, CreateView, FormView
+from django.urls import reverse
+from django.utils.functional import cached_property
+from django.views.generic import ListView, DetailView, CreateView
 
-from orders.forms import OrderForm
-from orders.models import Order
+from orders.forms import OrderForm, LabelForm
+from orders.models import Order, Label, Record
 
 
 class OrdersList(ListView):
@@ -57,3 +58,36 @@ class OrderUpload(CreateView):
                 f.write(unzipped.read(old_filename))
 
             order.record_set.create(asset=asset_path, type=type)
+
+
+class OrderLabel(CreateView):
+    model = Label
+    form_class = LabelForm
+    template_name = "orders/label.html"
+
+    @cached_property
+    def record(self):
+        qs = Record.objects.filter(is_done=False).exclude(label__user=self.request.user)
+        if "record" in self.request.POST:
+            return qs.filter(pk=self.request.POST.get("record"))
+        else:
+            return qs.order_by('?').first()
+
+    def get_initial(self):
+        return {
+            "record": self.record
+        }
+
+    def get_context_data(self, **kwargs):
+        kwargs['record'] = self.record
+        return super().get_context_data(**kwargs)
+
+    def get_success_url(self):
+        return reverse("orders:label")
+
+    def form_valid(self, form):
+        label = form.save(commit=False)
+        label.user = self.request.user
+        label.save()
+        label.record.check_if_done(label.answer)
+        return HttpResponseRedirect(self.get_success_url())
