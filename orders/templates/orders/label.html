@@ -5,7 +5,13 @@
         <p>No data to label. Please come back soon.</p>
     {% else %}
         <p>{{ record.description }}</p>
-        <img src="{{ record.asset }}" style="max-width: 400px; max-height: 400px;">
+        {% if record.type == 'image' %}
+            <img src="{{ record.asset }}" style="max-width: 400px; max-height: 400px;">
+        {% elif record.type == 'text' %}
+            <div class="text-resource">{{record.asset}}</div>
+        {% else %}
+            Error occured
+        {% endif %}
         <form method="post" action="">
             {% csrf_token %}
             {{ form.as_p }}

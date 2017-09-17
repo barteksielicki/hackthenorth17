@@ -10,6 +10,13 @@
             {% else %}
                 No data available yet
             {% endif %}
+        {% elif record.type == 'text' %}
+            <p> {{ record.asset }}</p>
+            {% if record.is_done %}
+                {{ record.labeled_as }}
+            {% else %}
+                No data available yet
+            {% endif %}
         {% endif %}
         <hr>
     {% endfor %}

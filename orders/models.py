@@ -23,6 +23,7 @@ class Order(models.Model):
 class Record(models.Model):
     RECORD_CHOICES = (
         ('image', 'Image'),
+        ('text', 'Text'),
     )
     order = models.ForeignKey('Order')
     type = models.CharField(max_length=16, choices=RECORD_CHOICES)

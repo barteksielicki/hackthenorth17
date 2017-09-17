@@ -1,16 +1,32 @@
 import os
 import zipfile
+import functools
+
 from uuid import uuid4
 
 from django.conf import settings
-from django.db.models import Count, Sum
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.models import (
+    Count,
+    Sum,
+)
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    ListView,
+)
 from django.utils.functional import cached_property
-from django.views.generic import ListView, DetailView, CreateView
 
-from orders.forms import OrderForm, LabelForm
-from orders.models import Order, Label, Record
+from orders.forms import (
+    LabelForm,
+    OrderForm,
+)
+from orders.models import (
+    Label,
+    Order,
+    Record,
+)
 
 
 class OrdersList(ListView):
@@ -43,21 +59,43 @@ class OrderUpload(CreateView):
         order = form.save(commit=False)
         order.issuer = self.request.user
         order.save()
-        self.extract_zipfile(form.cleaned_data["zip_file"], order, form.cleaned_data["type"])
+        if form.cleaned_data["type"] == 'image':
+            func = functools.partial(
+                self.process_image,
+                order=order,
+                type_=form.cleaned_data["type"],
+            )
+        elif form.cleaned_data["type"] == 'text':
+            func = functools.partial(
+                self.process_text,
+                order=order,
+                type_=form.cleaned_data["type"],
+            )
+        for fname_data in self.extract_zipfile(form.cleaned_data['zip_file']):
+            func(fname_data)
         return HttpResponseRedirect(self.get_success_url())
 
-    def extract_zipfile(self, archive, order, type):
+    def extract_zipfile(self, archive):
         unzipped = zipfile.ZipFile(archive)
         for old_filename in unzipped.namelist():
-            _, ext = os.path.splitext(old_filename)
-            new_filename = f"{uuid4().hex}{ext}"
-            path = os.path.join(settings.MEDIA_ROOT, "storage", new_filename)
-            asset_path = os.path.join(settings.MEDIA_URL, "storage", new_filename)
+            print(old_filename, unzipped.read(old_filename))
+            yield old_filename, unzipped.read(old_filename)
 
-            with open(path, "wb") as f:
-                f.write(unzipped.read(old_filename))
+    def process_image(self, file_data, order, type_):
+        old_filename, image_text = file_data
+        _, ext = os.path.splitext(old_filename)
+        new_filename = f"{uuid4().hex}{ext}"
+        path = os.path.join(settings.MEDIA_ROOT, "storage", new_filename)
+        asset_path = os.path.join(settings.MEDIA_URL, "storage", new_filename)
 
-            order.record_set.create(asset=asset_path, type=type)
+        with open(path, "wb") as f:
+            f.write(image_text)
+
+        order.record_set.create(asset=asset_path, type=type_)
+
+    def process_text(self, file_data, order, type_):
+        fname, text = file_data
+        order.record_set.create(asset=text, type=type_)
 
 
 class OrderLabel(CreateView):
