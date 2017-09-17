@@ -3,9 +3,11 @@ import zipfile
 from uuid import uuid4
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.views.generic import ListView, DetailView, CreateView
 
@@ -13,6 +15,7 @@ from orders.forms import OrderForm, LabelForm
 from orders.models import Order, Label, Record
 
 
+@method_decorator(login_required, name="dispatch")
 class OrdersList(ListView):
     template_name = "orders/list.html"
 
@@ -23,6 +26,7 @@ class OrdersList(ListView):
         return qs
 
 
+@method_decorator(login_required, name="dispatch")
 class OrdersDetails(DetailView):
     template_name = "orders/details.html"
 
@@ -31,6 +35,7 @@ class OrdersDetails(DetailView):
         return OrdersList.get_queryset(self)
 
 
+@method_decorator(login_required, name="dispatch")
 class OrderUpload(CreateView):
     model = Order
     form_class = OrderForm
@@ -60,6 +65,7 @@ class OrderUpload(CreateView):
             order.record_set.create(asset=asset_path, type=type)
 
 
+@method_decorator(login_required, name="dispatch")
 class OrderLabel(CreateView):
     model = Label
     form_class = LabelForm

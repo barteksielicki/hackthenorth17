@@ -17,12 +17,14 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.views.generic import RedirectView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url('', include('users.urls', namespace='users')),
-    url('', include('social_django.urls', namespace='social')),
-    url('^orders/', include('orders.urls', namespace='orders'))
+    url(r'^users/', include('users.urls', namespace='users')),
+    url(r'^orders/', include('orders.urls', namespace='orders')),
+    url(r'', include('social_django.urls', namespace='social')),
+    url(r'^$', RedirectView.as_view(pattern_name="orders:list"))
 ]
 
 urlpatterns += static(

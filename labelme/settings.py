@@ -25,7 +25,7 @@ SECRET_KEY = '&m3u)&d9r2q)2=!_@an3m_aq0g!xkijvyes2^&hz5i^ng*4%la'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -131,3 +131,10 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = '/media/'
+
+LOGIN_URL = '/users/login/'
+LOGIN_REDIRECT_URL = '/'
+
+SOCIAL_AUTH_COINBASE_KEY = '355525f42510b303b5185261627143f3f9a393e3b8047674d74ea9062f755e72'
+SOCIAL_AUTH_COINBASE_SECRET = '7771159aef49491469b66bf5159a3b8cbe167e67cb8a254acf75ccd78b5274f1'
+SOCIAL_AUTH_COINBASE_SCOPE = [...]
