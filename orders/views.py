@@ -54,7 +54,7 @@ class OrderUpload(CreateView):
         order.price = files_count * order.verifications_needed * settings.PRICE_PER_ITEM
         order.currency = settings.COINBASE_CURRENCY
         order.save()
-        order.charge()
+        # order.charge()
         return HttpResponseRedirect(self.get_success_url())
 
     def extract_zipfile(self, archive, order):
