@@ -1,10 +1,14 @@
 {% extends "base.html" %}
+{% load bootstrap3 %}
 
 {% block content %}
     <h1>Create new order</h1>
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Upload">
+        {% bootstrap_form form %}
+        <div class="hr-line-dashed"></div>
+        <p>Price per item: <strong>{{ view.price_per_item }} {{ view.currency }}</strong></p>
+        <div class="hr-line-dashed"></div>
+        <button class="btn btn-primary" type="submit"><i class="fa fa-check"></i>&nbsp;Submit</button>
     </form>
 {% endblock %}

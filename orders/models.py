@@ -1,12 +1,14 @@
 from django.conf import settings
 from django.db import models
 
+from users.models import CustomUser
+
 
 class Order(models.Model):
     issuer = models.ForeignKey(settings.AUTH_USER_MODEL)
     date_issued = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=32)
-    verifications_needed = models.PositiveIntegerField(default=2)
+    verifications_needed = models.PositiveIntegerField(default=2, verbose_name="Same answers to accept")
     price = models.DecimalField(max_digits=10, decimal_places=5, default=0)
     description = models.TextField()
     currency = models.CharField(max_length=16, choices=(
@@ -20,7 +22,8 @@ class Order(models.Model):
         ordering = ['is_done']
 
     def charge(self):
-        response = self.issuer.transfer_money(settings.COINBASE_MASTER_ACCOUNT, self.price, self.currency)
+        admin = CustomUser.objects.get(is_superuser=True)
+        response = self.issuer.transfer_money(admin.email, self.price, self.currency)
         return response['status'] == 'completed'
 
 
@@ -47,4 +50,4 @@ class Record(models.Model):
 class Label(models.Model):
     record = models.ForeignKey('Record')
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    answer = models.TextField()
+    answer = models.TextField(verbose_name="Your answer")

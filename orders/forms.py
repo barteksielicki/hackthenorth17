@@ -4,12 +4,11 @@ from orders.models import Record, Order, Label
 
 
 class OrderForm(forms.ModelForm):
-    type = forms.ChoiceField(Record.RECORD_CHOICES)
     zip_file = forms.FileField()
 
     class Meta:
         model = Order
-        fields = ('name', 'verifications_needed', 'description', 'type', 'zip_file')
+        fields = ('name', 'verifications_needed', 'description', 'zip_file')
 
 
 class LabelForm(forms.ModelForm):
@@ -18,5 +17,6 @@ class LabelForm(forms.ModelForm):
         model = Label
         fields = ('answer', 'record')
         widgets = {
-            'record': forms.HiddenInput
+            'record': forms.HiddenInput,
+            'answer': forms.TextInput
         }

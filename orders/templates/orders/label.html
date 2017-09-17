@@ -1,15 +1,20 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load bootstrap3 %}
+
 
 {% block content %}
     {% if not record %}
-        <p>No data to label. Please come back soon.</p>
+        <h3>No data to label. Please come back soon.</h3>
     {% else %}
-        <p>{{ record.description }}</p>
-        <img src="{{ record.asset }}" style="max-width: 400px; max-height: 400px;">
-        <form method="post" action="">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="Answer">
-        </form>
+        <div class="text-center col-sm-offset-4 col-sm-4">
+            <img src="{{ record.asset }}" style="max-width: 400px; max-height: 400px;">
+            <div class="hr-line-dashed"></div>
+            <p>{{ record.order.description }}</p>
+            <div class="hr-line-dashed"></div>
+            <form method="post" action="">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button class="btn btn-primary" type="submit"><i class="fa fa-tag"></i>&nbsp;Save</button>
+            </form>
+        </div>
     {% endif %}
 {% endblock %}

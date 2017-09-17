@@ -3,16 +3,43 @@
 {% block content %}
     {% regroup object_list by is_done as orders_groups %}
     {% for group in orders_groups %}
-        {% if group.grouper %}
-            <h1>In progress</h1>
-        {% else %}
-            <h1>Done</h1>
-        {% endif %}
-        {% for order in group.list %}
-            <a href="{% url "orders:details" pk=order.pk %}">{{ order.name }}</a> / {% widthratio order.records_done order.records_total 100 %}%<br>
-        {% endfor %}
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                {% if not group.grouper %}
+                    <h5>In progress</h5>
+                {% else %}
+                    <h5>Done</h5>
+                {% endif %}
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Dataset size</th>
+                            <th>Charged for</th>
+                            <th>Finished</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for order in group.list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><a href="{% url "orders:details" pk=order.pk %}">{{ order.name }}</a></td>
+                                <td>{{ order.record_set.count }}</td>
+                                <td>{{ order.price }} ETH</td>
+                                <td>{% widthratio order.records_done order.records_total 100 %}%</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     {% endfor %}
 
     <hr>
-    <a href="{% url "orders:new" %}">New order</a>
+    <a href="{% url "orders:new" %}" class="btn btn-primary" type="button"><i class="fa fa-plus"></i>&nbsp;Add new</a>
 {% endblock %}

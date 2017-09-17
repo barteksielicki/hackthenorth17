@@ -1,6 +1,34 @@
-{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% block content %}
-    <h1>Please sing up</h1>
-    <a href="{% url "social:begin" "coinbase" %}">Coinbase</a>
-{% endblock %}
+    <title>Label Me</title>
+
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+    <link href="/static/css/animate.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="gray-bg p-h-xl">
+<div class="p-h-lg middle-box text-center b-r-md white-bg animated fadeInDown">
+    <h2>Hello!</h2>
+    <h3 class="m-b-xl">Please sign up to start using our service.</h3>
+    <a href="{% url "social:begin" "coinbase" %}">
+        <img src="https://www.coindesk.com/wp-content/themes/coindesk2/images/events/consensus-2015/sponsors-and-partners/coinbase.png" style="max-width: 300px;">
+    </a>
+</div>
+
+<script src="/static/js/jquery-2.1.1.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="/static/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+<!-- Custom and plugin javascript -->
+<script src="/static/js/inspinia.js"></script>
+<script src="/static/js/plugins/pace/pace.min.js"></script>
+</body>
+</html>

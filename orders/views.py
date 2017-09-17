@@ -40,6 +40,8 @@ class OrderUpload(CreateView):
     model = Order
     form_class = OrderForm
     template_name = "orders/upload.html"
+    price_per_item = settings.PRICE_PER_ITEM
+    currency = settings.COINBASE_CURRENCY
 
     def get_success_url(self):
         return reverse("orders:list")
@@ -48,14 +50,14 @@ class OrderUpload(CreateView):
         order = form.save(commit=False)
         order.issuer = self.request.user
         order.save()
-        files_count = self.extract_zipfile(form.cleaned_data["zip_file"], order, form.cleaned_data["type"])
+        files_count = self.extract_zipfile(form.cleaned_data["zip_file"], order)
         order.price = files_count * order.verifications_needed * settings.PRICE_PER_ITEM
         order.currency = settings.COINBASE_CURRENCY
         order.save()
         order.charge()
         return HttpResponseRedirect(self.get_success_url())
 
-    def extract_zipfile(self, archive, order, type):
+    def extract_zipfile(self, archive, order):
         counter = 0
         unzipped = zipfile.ZipFile(archive)
         for old_filename in unzipped.namelist():
@@ -67,7 +69,7 @@ class OrderUpload(CreateView):
             with open(path, "wb") as f:
                 f.write(unzipped.read(old_filename))
 
-            order.record_set.create(asset=asset_path, type=type)
+            order.record_set.create(asset=asset_path, type="image")
             counter += 1
         return counter
 
@@ -80,7 +82,7 @@ class OrderLabel(CreateView):
 
     @cached_property
     def record(self):
-        qs = Record.objects.filter(is_done=False).exclude(label__user=self.request.user)
+        qs = Record.objects.filter(is_done=False).exclude(label__user=self.request.user)# .exclude(order__issuer=self.request.user)
         if "record" in self.request.POST:
             return qs.filter(pk=self.request.POST.get("record"))
         else:
@@ -103,4 +105,6 @@ class OrderLabel(CreateView):
         label.user = self.request.user
         label.save()
         label.record.check_if_done(label.answer)
+        if label.user.check_if_payment():
+            label.user.pay(settings.REWARD_AFTER * settings.REWARD_PER_ITEM, settings.COINBASE_CURRENCY)
         return HttpResponseRedirect(self.get_success_url())

@@ -1,6 +1,7 @@
 import json
 
 import requests
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
 
@@ -37,4 +38,13 @@ class CustomUser(AbstractUser):
                 "Authorization": f"Bearer {self.get_token()}",
             }
         )
+        print(response.content)
         return json.loads(response.content)['data']
+
+    def check_if_payment(self):
+        labeled = self.label_set.count()
+        return labeled and (labeled % settings.REWARD_AFTER == 0)
+
+    def pay(self, amount, currency):
+        admin = CustomUser.objects.get(is_superuser=True)
+        admin.transfer_money(self.email, amount, currency)

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'social_django',
     'orders',
     'users',
+    'bootstrap3'
 
 ]
 
@@ -128,6 +129,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = '/media/'
@@ -137,12 +141,13 @@ LOGIN_REDIRECT_URL = '/'
 
 SOCIAL_AUTH_COINBASE_KEY = '355525f42510b303b5185261627143f3f9a393e3b8047674d74ea9062f755e72'
 SOCIAL_AUTH_COINBASE_SECRET = '7771159aef49491469b66bf5159a3b8cbe167e67cb8a254acf75ccd78b5274f1'
-SOCIAL_AUTH_COINBASE_SCOPE = ['wallet:transactions:transfer', 'wallet:transactions:read', 'wallet:accounts:read', 'wallet:transactions:send']
+SOCIAL_AUTH_COINBASE_SCOPE = ['wallet:transactions:transfer', 'wallet:transactions:read', 'wallet:accounts:read', 'wallet:transactions:send', 'wallet:user:email']
 
 
 COINBASE_MASTER_ACCOUNT = 'blackyabbol@gmail.com'
 PRICE_PER_ITEM = 0.00015
 REWARD_PER_ITEM = 0.0001
 COINBASE_CURRENCY = 'ETH'
+REWARD_AFTER = 3
 
 AUTH_USER_MODEL = 'users.CustomUser'
