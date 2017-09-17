@@ -48,10 +48,15 @@ class OrderUpload(CreateView):
         order = form.save(commit=False)
         order.issuer = self.request.user
         order.save()
-        self.extract_zipfile(form.cleaned_data["zip_file"], order, form.cleaned_data["type"])
+        files_count = self.extract_zipfile(form.cleaned_data["zip_file"], order, form.cleaned_data["type"])
+        order.price = files_count * order.verifications_needed * settings.PRICE_PER_ITEM
+        order.currency = settings.COINBASE_CURRENCY
+        order.save()
+        order.charge()
         return HttpResponseRedirect(self.get_success_url())
 
     def extract_zipfile(self, archive, order, type):
+        counter = 0
         unzipped = zipfile.ZipFile(archive)
         for old_filename in unzipped.namelist():
             _, ext = os.path.splitext(old_filename)
@@ -63,6 +68,8 @@ class OrderUpload(CreateView):
                 f.write(unzipped.read(old_filename))
 
             order.record_set.create(asset=asset_path, type=type)
+            counter += 1
+        return counter
 
 
 @method_decorator(login_required, name="dispatch")

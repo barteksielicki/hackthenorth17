@@ -7,8 +7,14 @@
 <body>
     <header>
         {% if user.is_authenticated %}
-            <a href="{% url "orders:list" %}">My orders</a> | <a href="{% url "orders:label" %}">Earn some coins</a> | <a href="{% url "users:logout" %}">Log out</a>
+            {{ user.get_full_name }} | <a href="{% url "orders:list" %}">My orders</a> | <a href="{% url "orders:label" %}">Earn some coins</a> | <a href="{% url "users:logout" %}">Log out</a>
         {% endif %}
+        <hr>
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
     </header>
 {% block content %}
 {% endblock %}

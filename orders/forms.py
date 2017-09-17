@@ -9,7 +9,7 @@ class OrderForm(forms.ModelForm):
 
     class Meta:
         model = Order
-        fields = ('name', 'verifications_needed', 'price', 'currency', 'description', 'type', 'zip_file')
+        fields = ('name', 'verifications_needed', 'description', 'type', 'zip_file')
 
 
 class LabelForm(forms.ModelForm):

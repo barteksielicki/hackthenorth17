@@ -6,8 +6,8 @@ class Order(models.Model):
     issuer = models.ForeignKey(settings.AUTH_USER_MODEL)
     date_issued = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=32)
-    verifications_needed = models.PositiveIntegerField(default=3)
-    price = models.DecimalField(max_digits=10, decimal_places=5)
+    verifications_needed = models.PositiveIntegerField(default=2)
+    price = models.DecimalField(max_digits=10, decimal_places=5, default=0)
     description = models.TextField()
     currency = models.CharField(max_length=16, choices=(
         ('bitcoin', 'BITCOIN'),
@@ -18,6 +18,10 @@ class Order(models.Model):
 
     class Meta:
         ordering = ['is_done']
+
+    def charge(self):
+        response = self.issuer.transfer_money(settings.COINBASE_MASTER_ACCOUNT, self.price, self.currency)
+        return response['status'] == 'completed'
 
 
 class Record(models.Model):
